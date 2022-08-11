@@ -36,7 +36,7 @@ namespace sylar{
 
         virtual std::string toString() = 0;
         virtual bool fromString(const std::string& val) = 0;
-
+        virtual std::string getTypeName() const = 0;
     protected:
         std::string m_name;
         std::string m_description;
@@ -294,14 +294,14 @@ namespace sylar{
                 setValue(FromStr()(val));
             }catch (std::exception& e){
                 SYLAR_LOG_ERROR(SYLAR_LOG_ROOT()) << "ConfigVar::toString exception"
-                    << e.what() << " convert: string tp" << typeid(m_val).name();
+                    << e.what() << " convert: string type: " << typeid(m_val).name();
             }
             return false;
         }
 
         const T getValue() const {return m_val;}
         void setValue(const T& val) {m_val = val;}
-
+        std::string getTypeName() const override{return typeid(T).name();}
     private:
         T m_val;
     };
@@ -318,11 +318,12 @@ namespace sylar{
             if(it != s_datas.end()){
                 auto tmp = std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
                 if(tmp){
-                    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "Lookup name=" << name << "exists";
+                    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "Lookup name= " << name << " exists";
                     return tmp;
                 } else {
-                    SYLAR_LOG_ERROR(SYLAR_LOG_ROOT()) << "Lookup name=" << name << "exists but type not "
-                        << typeid(T).name();
+                    SYLAR_LOG_ERROR(SYLAR_LOG_ROOT()) << "Lookup name= " << name << " exists but type not "
+                        << typeid(T).name() << " real_type= " << it->second->getTypeName()
+                        << " " << it->second->toString();
                     return nullptr;
                 }
 

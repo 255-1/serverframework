@@ -30,3 +30,18 @@ system:
   str_int_umap:
     ub: 3
     un: -1
+
+class:
+  person:
+    name: zzj
+    age: 12
+    sex: true
+  map:
+    sylar1:
+      name: sylar1
+      age: 3
+      sex: true
+    sylar2:
+      name: sylar2
+      age: 23
+      sex: true
