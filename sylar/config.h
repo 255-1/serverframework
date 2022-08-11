@@ -11,7 +11,12 @@
 #include <boost/lexical_cast.hpp>
 #include "../sylar/log.h"
 #include <yaml-cpp/yaml.h>
-
+#include <list>
+#include <vector>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace sylar{
 
@@ -65,6 +70,8 @@ namespace sylar{
         }
     };
 
+
+
     //vector->string
     template <class T>
     class LexcicalCast<std::vector<T>, std::string> {
@@ -73,6 +80,179 @@ namespace sylar{
             YAML::Node node;
             for(auto& i : v) {
                 node.push_back(YAML::Load(LexcicalCast<T, std::string>() (i)));
+            }
+            std::stringstream ss;
+            ss << node;
+            return ss.str();
+        }
+    };
+
+    //string->list
+    template <class T>
+    class LexcicalCast<std::string, std::list<T>> {
+    public:
+        std::list<T> operator()(const std::string& v) {
+            YAML::Node node = YAML::Load(v);
+            typename std::list<T> vec;
+            std::stringstream ss;
+            for(size_t i = 0; i < node.size(); ++i) {
+                ss.str("");
+                ss << node[i];
+                vec.push_back(LexcicalCast<std::string, T>()(ss.str()));
+            }
+
+            return vec;
+        }
+    };
+
+    //list->string
+    template <class T>
+    class LexcicalCast<std::list<T>, std::string> {
+    public:
+        std::string operator()(const std::list<T>& v) {
+            YAML::Node node;
+            for(auto& i : v) {
+                node.push_back(YAML::Load(LexcicalCast<T, std::string>() (i)));
+            }
+            std::stringstream ss;
+            ss << node;
+            return ss.str();
+        }
+    };
+
+    //string->set
+    template <class T>
+    class LexcicalCast<std::string, std::set<T>> {
+    public:
+        std::set<T> operator()(const std::string& v) {
+            YAML::Node node = YAML::Load(v);
+            typename std::set<T> vec;
+            std::stringstream ss;
+            for(size_t i = 0; i < node.size(); ++i) {
+                ss.str("");
+                ss << node[i];
+                vec.insert(LexcicalCast<std::string, T>()(ss.str()));
+            }
+
+            return vec;
+        }
+    };
+
+    //set->string
+    template <class T>
+    class LexcicalCast<std::set<T>, std::string> {
+    public:
+        std::string operator()(const std::set<T>& v) {
+            YAML::Node node;
+            for(auto& i : v) {
+                node.push_back(YAML::Load(LexcicalCast<T, std::string>() (i)));
+            }
+            std::stringstream ss;
+            ss << node;
+            return ss.str();
+        }
+    };
+
+    //string->unordered_set
+    template <class T>
+    class LexcicalCast<std::string, std::unordered_set<T>> {
+    public:
+        std::unordered_set<T> operator()(const std::string& v) {
+            YAML::Node node = YAML::Load(v);
+            typename std::unordered_set<T> vec;
+            std::stringstream ss;
+            for(size_t i = 0; i < node.size(); ++i) {
+                ss.str("");
+                ss << node[i];
+                vec.insert(LexcicalCast<std::string, T>()(ss.str()));
+            }
+
+            return vec;
+        }
+    };
+
+    //unordered_set->string
+    template <class T>
+    class LexcicalCast<std::unordered_set<T>, std::string> {
+    public:
+        std::string operator()(const std::unordered_set<T>& v) {
+            YAML::Node node;
+            for(auto& i : v) {
+                node.push_back(YAML::Load(LexcicalCast<T, std::string>() (i)));
+            }
+            std::stringstream ss;
+            ss << node;
+            return ss.str();
+        }
+    };
+
+    //string->map
+    template <class T>
+    class LexcicalCast<std::string, std::map<std::string, T>> {
+    public:
+        std::map<std::string, T> operator()(const std::string& v) {
+            YAML::Node node = YAML::Load(v);
+            typename std::map<std::string, T> vec;
+            std::stringstream ss;
+            for(auto it = node.begin();
+                    it != node.end(); ++it) {
+                ss.str("");
+                ss << it->second;
+                vec.insert(std::make_pair(it->first.Scalar()
+                                             ,LexcicalCast<std::string, T>()(ss.str())));
+            }
+
+            return vec;
+        }
+    };
+
+
+
+    //map->string
+    template <class T>
+    class LexcicalCast<std::map<std::string, T>, std::string> {
+    public:
+        std::string operator()(const std::map<std::string, T>& v) {
+            YAML::Node node;
+            for(auto& i : v) {
+                node[i.first] = YAML::Load(LexcicalCast<T, std::string>() (i.second));
+            }
+            std::stringstream ss;
+            ss << node;
+            return ss.str();
+        }
+    };
+
+    //string->unordered_map
+    template <class T>
+    class LexcicalCast<std::string, std::unordered_map<std::string, T>> {
+    public:
+        std::unordered_map<std::string, T> operator()(const std::string& v) {
+            YAML::Node node = YAML::Load(v);
+            typename std::unordered_map<std::string, T> vec;
+            std::stringstream ss;
+            for(auto it = node.begin();
+                it != node.end(); ++it) {
+                ss.str("");
+                ss << it->second;
+                vec.insert(std::make_pair(it->first.Scalar()
+                        ,LexcicalCast<std::string, T>()(ss.str())));
+            }
+
+            return vec;
+        }
+    };
+
+
+
+    //unordered_map->string
+    template <class T>
+    class LexcicalCast<std::unordered_map<std::string, T>, std::string> {
+    public:
+        std::string operator()(const std::unordered_map<std::string, T>& v) {
+            YAML::Node node;
+            for(auto& i : v) {
+                node[i.first] = YAML::Load(LexcicalCast<T, std::string>() (i.second));
             }
             std::stringstream ss;
             ss << node;
@@ -134,6 +314,19 @@ namespace sylar{
         template<class T>
         static typename ConfigVar<T>::ptr Lookup(const std::string& name,
              const T& default_value, const std::string& description=""){
+            auto it = s_datas.find(name);
+            if(it != s_datas.end()){
+                auto tmp = std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
+                if(tmp){
+                    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "Lookup name=" << name << "exists";
+                    return tmp;
+                } else {
+                    SYLAR_LOG_ERROR(SYLAR_LOG_ROOT()) << "Lookup name=" << name << "exists but type not "
+                        << typeid(T).name();
+                    return nullptr;
+                }
+
+            }
             auto tmp = Lookup<T>(name);
             if(tmp){
                 SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "Lookup name=" << name << "exists";

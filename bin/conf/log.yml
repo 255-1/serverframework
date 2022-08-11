@@ -21,3 +21,12 @@ system:
     - 10
     - 20
     - 40
+  int_list: [100, 200]
+  int_set: [300, 400]
+  int_uset: [-1, -2, -3]
+  str_int_map:
+    k: 30
+    b: 4
+  str_int_umap:
+    ub: 3
+    un: -1
