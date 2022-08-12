@@ -195,8 +195,14 @@ void test_class(){
     XX_PM(g_person_map, "class.map after");
 
 }
+
+void test_log(){
+    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/log.yml");
+    sylar::Config::LoadFromYaml(root);
+}
+
 int main(int argc, char ** args){
 
-    test_class();
+    test_log();
     return 0;
 }

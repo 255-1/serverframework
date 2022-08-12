@@ -51,6 +51,7 @@
 namespace sylar{
 
 class Logger;
+class LogManager;
 
 class LogLevel {
 public:
@@ -64,6 +65,7 @@ public:
     };
 
     static const char* ToString(LogLevel::Level level);
+    static LogLevel::Level FromString(const std::string& str);
 };
 
 class LogEvent{
@@ -130,9 +132,12 @@ public:
     };
     void init();
 
+    bool isError() const {return m_error;}
+
 private:
     std::string m_pattern;
     std::vector<FormatItem::ptr> m_items;
+    bool m_error = false;
 };
 
 
@@ -155,6 +160,7 @@ protected:
 
 
 class Logger : public std::enable_shared_from_this<Logger>{
+    friend class LogManager;
 public:
     typedef std::shared_ptr<Logger> ptr;
 
@@ -169,14 +175,21 @@ public:
 
     void addAppender(LogAppender::ptr appender);
     void delAppender(LogAppender::ptr appender);
+    void clearAppenders();
     LogLevel::Level getLevel() const {return m_level;}
     void setLevel(LogLevel::Level val){m_level = val;}
+
     const std::string& getName() const {return m_name;}
+
+    void setFormatter(LogFormatter::ptr val);
+    void setFormatter(const std::string& val);
+    LogFormatter::ptr getFormatter() ;
 private:
     std::string m_name;
     LogLevel::Level m_level;
     std::list<LogAppender::ptr> m_appenders;
     LogFormatter::ptr m_formatter;
+    Logger::ptr m_root;
 };
 
 class StdoutLogAppender : public LogAppender{

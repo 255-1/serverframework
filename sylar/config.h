@@ -388,6 +388,7 @@ namespace sylar{
 
         static ConfigVarBase::ptr LookupBase(const std::string& name);
     private:
+
         static ConfigVarMap s_datas;
 
     };
