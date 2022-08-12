@@ -17,6 +17,7 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <functional>
 
 namespace sylar{
 
@@ -268,6 +269,7 @@ namespace sylar{
     class ConfigVar : public ConfigVarBase{
     public:
         typedef std::shared_ptr<ConfigVar> ptr;
+        typedef std::function<void (const T& old_value, const T& new_value)> on_change_cb;
 
         ConfigVar(const std::string& name
                   ,const T& default_value
@@ -300,10 +302,38 @@ namespace sylar{
         }
 
         const T getValue() const {return m_val;}
-        void setValue(const T& val) {m_val = val;}
+        void setValue(const T& v) {
+            if(v == m_val){
+                return ;
+            }
+            for(auto&i : m_cbs){
+                i.second(m_val, v);
+            }
+            m_val = v;
+        }
         std::string getTypeName() const override{return typeid(T).name();}
+
+        void addListener(uint64_t key, on_change_cb cb) {
+            m_cbs[key] = cb;
+        }
+
+        void delListener(uint64_t key) {
+            m_cbs.erase(key);
+        }
+
+        on_change_cb getListener(uint64_t key) {
+            auto it = m_cbs.find(key);
+            return it == m_cbs.end() ? nullptr : it->second;
+        }
+
+        void clarListener(){
+            m_cbs.clear();
+        }
     private:
         T m_val;
+
+        //变更回调函数数组， function没有比较函数==， 座椅使用map通过key删除
+        std::map<uint64_t, on_change_cb> m_cbs;
     };
 
 

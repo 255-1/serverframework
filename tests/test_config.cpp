@@ -60,7 +60,7 @@ void print_yaml(const YAML::Node& node, int level){
 }
 
 void test_yaml(){
-    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/test.yml");
 
     print_yaml(root, 0);
 
@@ -97,7 +97,7 @@ void test_config() {
 //    XX_M(g_str_int_umap_value_config, str_int_umap, before);
 
 
-    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/test.yml");
     sylar::Config::LoadFromYaml(root);
 
 //    SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "after: " << g_int_value_config->getValue();
@@ -123,6 +123,11 @@ public:
             << " sex=" << m_sex
             << "]";
         return ss.str();
+    }
+    bool operator==(const Person& oth) const {
+        return m_name == oth.m_name
+               && m_age == oth.m_age
+               && m_sex == oth.m_sex;
     }
 };
 
@@ -154,6 +159,7 @@ namespace sylar{
             ss << node;
             return ss.str();
         }
+
     };
 }
 
@@ -176,8 +182,13 @@ void test_class(){
         SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << prefix << ": size=" << m.size(); \
     }
 
+    g_person->addListener(10, [](const Person& old_value, const Person& new_value){
+        SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "old_value=" << old_value.toString()
+            << " new value=" << new_value.toString();
+    });
+
     XX_PM(g_person_map, "class.map before");
-    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/log.yml");
+    YAML::Node root = YAML::LoadFile("/home/zhi-jun/CLionProjects/serverframework/bin/conf/test.yml");
     sylar::Config::LoadFromYaml(root);
 
     SYLAR_LOG_INFO(SYLAR_LOG_ROOT()) << "after: " << g_person->getValue().toString() << " - " << g_person->toString();
